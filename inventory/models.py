@@ -32,7 +32,7 @@ class Choice(models.Model):
 
 class Set(models.Model):
     name = models.CharField(max_length=100)
-    code = models.CharField(max_length=5)
+    code = models.CharField(max_length=10)
     release_date = models.DateField()
     cards_in_set = models.IntegerField()
 
