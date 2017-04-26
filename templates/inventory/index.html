@@ -4,7 +4,7 @@
 {% if card_list %}
     <table class="table table-hover table-striped table-small">
         <tr>
-            <th></th>
+            <th class="fit"></th>
             <th>Name</th>
             <th>Set</th>
             <th>Stock</th>
@@ -12,7 +12,7 @@
         </tr>
         {% for card in card_list %}
             <tr>
-                <td><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
+                <td class="fit"><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
                 <td>{{ card.name }}</td>
                 <td>{{ card.set.code }}</td>
                 <td>{{ card.stock }}</td>
