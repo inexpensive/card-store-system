@@ -134,7 +134,7 @@ def get_color_identity(card):
         color_identity = ['C']
     return json.dumps(color_identity)
 
-
+# TODO: add card condition!!!!
 with open('AllSets.json') as data_file:
     data = json.load(data_file)
     card_set = data['KLD']

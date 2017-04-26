@@ -66,3 +66,22 @@ class Database:
         self.execute_sql(sql, args)
         result = self.get_results()
         return result.__len__() > 0
+
+    def get_cards(self):
+        sql = 'SELECT card.name as card_name, card.foil, set.name AS set_name, card.collector_number ' \
+              'FROM inventory_card AS card, inventory_set AS set WHERE card.set_id = set.id'
+        self.execute_sql(sql, None)
+        return self.get_results()
+
+    def update_price(self, price, card):
+        card_name = card[0]
+        is_foil = card[1]
+        set_name = card[2]
+        collector_number = card[3]
+        sql = 'UPDATE inventory_card SET price = %s ' \
+              'WHERE set_id = (SELECT id from inventory_set WHERE name = %s) AND name = %s AND ' \
+              'foil = %s AND collector_number = %s'
+        self.execute_sql(sql, (price, set_name, card_name, is_foil, collector_number))
+        self.update_database()
+
+
