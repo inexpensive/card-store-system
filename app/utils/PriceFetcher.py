@@ -1,12 +1,8 @@
-import datetime
-import os
-from app.utils.Database import Database
 from app.utils.CardOps import is_basic_land
 import re
 from forex_python.converter import CurrencyRates
 import requests
 from bs4 import BeautifulSoup
-import time
 
 
 class Price:
