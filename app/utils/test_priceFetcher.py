@@ -23,8 +23,10 @@ class TestPriceFetcher(TestCase):
     def test_get_price_from_mtg_goldfish(self):
         bad_url = "https://www.google.com/qweasdfqeadsc"
         good_url = "https://www.mtggoldfish.com/price/Amonkhet/Nissa+Steward+of+Elements/"
+        valid_url_with_no_paper_price = "https://www.mtggoldfish.com/price/Vintage+Masters/Black+Lotus"
         self.assertLess(self.pf.get_price_from_mtg_goldfish(bad_url), 0)
         self.assertGreater(self.pf.get_price_from_mtg_goldfish(good_url), 0)
+        self.assertLess(self.pf.get_price_from_mtg_goldfish(valid_url_with_no_paper_price), 0)
 
     def test_convert_to_cad(self):
         self.assertAlmostEqual(self.pf.convert_to_cad(3), self.pf.exchange_rate * 3)
@@ -38,10 +40,10 @@ class TestPriceFetcher(TestCase):
             'condition': 'MP'
         }
         valid_card = {
-            'name': 'Geist of Saint Traft',
-            'set': 'Innistrad',
+            'name': 'Forest',
+            'set': 'Shadows over Innistrad',
             'is_foil': False,
-            'collector_number': 213,
+            'collector_number': 295,
             'condition': 'NM'
         }
         self.assertLess(self.pf.get_price(invalid_card), 0)
