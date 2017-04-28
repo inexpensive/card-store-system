@@ -1,8 +1,37 @@
-from app.utils.CardOps import is_basic_land
 import re
 from forex_python.converter import CurrencyRates
 import requests
 from bs4 import BeautifulSoup
+
+
+def round_price(price):
+    if price < 0.3:
+        price = 0.25
+    elif price < 0.55:
+        price = 0.5
+    elif price < 0.8:
+        price = 0.75
+    elif price < 5:
+        price = round(price * 10) / 10 - 0.01
+    elif price < 10:
+        price = round(price * 2) / 2 - 0.01
+    elif price < 50:
+        price = round(price) - 0.01
+    else:
+        price = round(price / 5.0) * 5 - 0.01
+    return price
+
+
+def get_price_markup_from_mtg_goldfish(url):
+    url += '#paper'
+    r = requests.get(url)
+    if r.status_code == 200:
+        soup = BeautifulSoup(r.content, 'lxml')
+        table = soup.find('table', class_='table-bordered')
+        table_rows = table.find_all('tr')
+        return table_rows[1:]
+    else:
+        return []
 
 
 class PriceFetcher:
@@ -14,45 +43,16 @@ class PriceFetcher:
         c = CurrencyRates()
         self.exchange_rate = c.get_rate('USD', 'CAD')
 
-    @staticmethod
-    def convert_to_mtg_goldfish(name):
-        name = name.replace("'", '')
-        name = name.replace(',', ' ')
-        name = re.sub('\s+', '+', name)
-        return name
-
-    def get_price_from_mtg_goldfish(self, url):
-        r = requests.get(url)
-        if r.status_code == 200:
-            try:
-                soup = BeautifulSoup(r.content, 'lxml')
-                price_box_paper = soup.find('div', class_='price-box paper')
-                price = float(price_box_paper.find('div', class_='price-box-price').text)
-            except AttributeError:
-                price = -1
-        else:
-            price = -1
-        return self.convert_to_cad(price)
-
     def convert_to_cad(self, price):
         return price * self.exchange_rate
 
-    def get_price(self, card, price_adjustment=1):
-        card_name = self.convert_to_mtg_goldfish(card['name'])
-        set_name = self.convert_to_mtg_goldfish(card['set'])
-        is_foil = card['is_foil']
-        collector_number = card['collector_number']
-        condition = card['condition']
-        if is_basic_land(card_name):
-            card_name += '-{0}'.format(collector_number)
-        foil_modifier = ''
-        if is_foil:
-            foil_modifier = ':Foil'
-        url = 'https://www.mtggoldfish.com/price/{0}{1}/{2}'.format(set_name, foil_modifier, card_name)
-        price = self.get_price_from_mtg_goldfish(url)
-        if condition != 'NM':
-            price = self.apply_condition_multiplier(price, condition)
-        return price * price_adjustment
+    def get_set_prices(self, set, price_adjustment=1, foil=False):
+        url = 'https://www.mtggoldfish.com/index/{0}'.format(set)
+        if foil:
+            url += '_F'
+        table_rows = get_price_markup_from_mtg_goldfish(url)
+        prices = self.get_prices_from_table_rows(table_rows, price_adjustment)
+        return prices
 
     @staticmethod
     def apply_condition_multiplier(price, condition):
@@ -63,4 +63,23 @@ class PriceFetcher:
         elif condition == 'HP':
             price = price * 0.5
         return price
+
+    def get_prices_from_table_rows(self, table_rows, price_adjustment):
+        prices = {}
+        for row in table_rows:
+            name = row.find('a').text
+            price = self.convert_to_cad(float(re.sub('[\n,]', '', row.find('td', class_='text-right').text))) * price_adjustment
+            price_by_condition = self.get_condition_prices_tuple(price)
+            prices[name] = price_by_condition
+        return prices
+
+    def get_condition_prices_tuple(self, price):
+        nm_price = round_price(price)
+        sp_price = round_price(self.apply_condition_multiplier(price, 'SP'))
+        mp_price = round_price(self.apply_condition_multiplier(price, 'MP'))
+        hp_price = round_price(self.apply_condition_multiplier(price, 'HP'))
+        price_by_condition = (nm_price, sp_price, mp_price, hp_price)
+        return price_by_condition
+
+
 
