@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 
 
-class Price:
+class PriceFetcher:
     def __init__(self):
         self.exchange_rate = None
         self.update_rate()
@@ -23,11 +23,14 @@ class Price:
 
     def get_price_from_mtg_goldfish(self, url):
         r = requests.get(url)
-        try:
-            soup = BeautifulSoup(r.content, 'lxml')
-            price_box_paper = soup.find('div', class_='price-box paper')
-            price = float(price_box_paper.find('div', class_='price-box-price').text)
-        except AttributeError:
+        if r.status_code == 200:
+            try:
+                soup = BeautifulSoup(r.content, 'lxml')
+                price_box_paper = soup.find('div', class_='price-box paper')
+                price = float(price_box_paper.find('div', class_='price-box-price').text)
+            except AttributeError:
+                price = -1
+        else:
             price = -1
         return self.convert_to_cad(price)
 
