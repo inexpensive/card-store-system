@@ -5,31 +5,6 @@ import datetime
 import json
 
 
-class Question(models.Model):
-    question_text = models.CharField(max_length=200)
-    pub_date = models.DateTimeField('date published')
-
-    def __str__(self):
-        return self.question_text
-
-    def was_published_recently(self):
-        now = timezone.now()
-        return now - datetime.timedelta(days=1) <= self.pub_date <= now
-
-    was_published_recently.admin_order_field = 'pub_date'
-    was_published_recently.boolean = True
-    was_published_recently.short_description = 'Published recently?'
-
-
-class Choice(models.Model):
-    question = models.ForeignKey(Question)
-    choice_test = models.CharField(max_length=200)
-    votes = models.IntegerField(default=0)
-
-    def __str__(self):
-        return self.choice_test
-
-
 class Set(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=10)
@@ -46,12 +21,23 @@ class Card(models.Model):
         ('U', 'Uncommon'),
         ('R', 'Rare'),
         ('M', 'Mythic'),
+        ('B', 'Basic Land'),
+    )
+
+    CONDITIONS = (
+        ('NM', 'Near Mint'),
+        ('SP', 'Slightly Played'),
+        ('MP', 'Moderately Played'),
+        ('HP', 'Heavily Played')
     )
 
     name = models.CharField(max_length=170)
     set = models.ForeignKey(Set)
     color = JSONField()
     color_identity = JSONField()
+    layout_type = models.CharField(max_length=50)
+    ordered_card_names = JSONField()
+    is_focal_card = models.BooleanField()
     super_types = JSONField()
     types = JSONField()
     sub_types = JSONField()
@@ -65,8 +51,9 @@ class Card(models.Model):
     artist = models.CharField(max_length=100)
     stock = models.IntegerField()
     price = models.FloatField()
-    image = models.ImageField(upload_to='images/', default='images/None/nothing.img')
+    image = models.ImageField(upload_to='templates/images/', default='templates/images/None/nothing.img')
     rarity = models.CharField(max_length=1, choices=RARITIES)
+    condition = models.CharField(max_length=2, choices=CONDITIONS)
     foil = models.BooleanField()
     power = models.SmallIntegerField()
     toughness = models.SmallIntegerField()

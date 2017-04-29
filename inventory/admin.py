@@ -1,18 +1,5 @@
 from django.contrib import admin
-from .models import Choice, Question, Set, Card
-
-
-class ChoiceInLine(admin.TabularInline):
-    model = Choice
-    extra = 3
-
-
-class QuestionAdmin(admin.ModelAdmin):
-    fieldsets = [
-        (None, {'fields': ['question_text']}),
-        ('Date Information', {'fields': ['pub_date'], 'classes': ['collapse']}),
-    ]
-    inlines = [ChoiceInLine]
+from .models import Set, Card
 
 
 class SetAdmin(admin.ModelAdmin):
@@ -49,6 +36,5 @@ class CardAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Question, QuestionAdmin)
 admin.site.register(Set, SetAdmin)
 admin.site.register(Card, CardAdmin)
