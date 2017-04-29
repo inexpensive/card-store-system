@@ -4,9 +4,9 @@ from urllib.request import urlretrieve
 import time
 import datetime
 from app.utils.Database import Database
-from bs4 import BeautifulSoup
-import requests
 import re
+
+from app.utils.PriceFetcher import PriceFetcher
 
 """
 Requires the AllSets.json file from www.mtgjson.com/json/AllSets.json.zip
@@ -65,16 +65,18 @@ def get_power_and_toughness(card):
 
 def download_image(name, card):
     multiverse_id = ''
-    image_path = os.path.abspath('../images/None/no_art.jpg')
+    image_path = os.path.abspath('../inventory/static/images/None/no_art.jpg')
     if 'multiverseid' in card.keys():
         multiverse_id = card['multiverseid']
-        # noinspection PyPep8Naming
-        image_URL = 'http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card'.format(multiverse_id)
-        image_path = os.path.abspath('../images/{0}/{1}_{2}.jpg'.format(card_set_code, name.replace(' ', '_'), multiverse_id))
-        directory = os.path.dirname(image_path)
-        if not os.path.exists(directory):
-            os.makedirs(directory)
-        urlretrieve(image_URL, image_path)
+        image_path = os.path.abspath(
+            '../inventory/static/images/{0}/{1}_{2}.jpg'.format(card_set_code, name.replace(' ', '_'), multiverse_id))
+        if not os.path.exists(image_path):
+            directory = os.path.dirname(image_path)
+            if not os.path.exists(directory):
+                os.makedirs(directory)
+            image_URL = 'http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card'.format(
+                multiverse_id)
+            urlretrieve(image_URL, image_path)
         image_path = re.search("/images.*", image_path).group(0)
     return multiverse_id, image_path
 
@@ -97,24 +99,34 @@ def is_basic_land(card_name):
     return card_name in basic_lands
 
 
-def get_price(set_name, card_name, is_foil, collectors_number):
-    price = -1
-    set_name = convert_to_mtg_goldfish(set_name)
-    card_name = convert_to_mtg_goldfish(card_name)
-    if is_basic_land(card_name):
-        card_name += "-{0}".format(collectors_number)
-    foil_modifier = ""
+def get_card_price(card_name, condition, price_dict):
+    if card_name not in price_dict.keys():
+        price = -1
+    else:
+        price_by_condition = price_dict[card_name]
+        if condition == 'NM':
+            price = price_by_condition[0]
+        elif condition == 'SP':
+            price = price_by_condition[1]
+        elif condition == 'MP':
+            price = price_by_condition[2]
+        else:
+            price = price_by_condition[3]
+    return price
+
+
+def get_price(card_name, is_foil, layout_type, is_focal_card, ordered_card_names, condition, non_foil_prices,
+              foil_prices):
+    if layout_type == 'split' or layout_type == 'aftermath':
+        if is_focal_card:
+            if card_name != 'Who':
+                card_name = ordered_card_names[0] + ' // ' + ordered_card_names[1]
+            else:
+                card_name = 'Who/What/When/Where/Why'
     if is_foil:
-        foil_modifier = ":Foil"
-    url = "https://www.mtggoldfish.com/price/{0}{1}/{2}".format(set_name, foil_modifier, card_name)
-    r = requests.get(url)
-    if r.status_code == 200:
-        try:
-            soup = BeautifulSoup(r.content, "lxml")
-            price_box_paper = soup.find("div", class_="price-box paper")
-            price = float(price_box_paper.find("div", class_="price-box-price").text)
-        except AttributeError:
-            price = -1
+        price = get_card_price(card_name, condition, foil_prices)
+    else:
+        price = get_card_price(card_name, condition, non_foil_prices)
     return price
 
 
@@ -134,12 +146,28 @@ def get_color_identity(card):
         color_identity = ['C']
     return json.dumps(color_identity)
 
-# TODO: add card condition!!!!
+
+def get_layout_type(card):
+    layout_type = card['layout']
+    if layout_type == 'normal':
+        ordered_card_names = []
+        is_focal_card = True
+    else:
+        ordered_card_names = card['names']
+        if card['name'] == ordered_card_names[0]:
+            is_focal_card = True
+        else:
+            is_focal_card = False
+    return layout_type, ordered_card_names, is_focal_card
+
+
 with open('AllSets.json') as data_file:
     data = json.load(data_file)
-    card_set = data['KLD']
-    card_set_name = card_set['name']
+    card_set = data['AKH']
     card_set_code = card_set['code']
+    price_fetcher = PriceFetcher()
+    non_foil_prices = price_fetcher.get_set_prices(card_set_code)
+    foil_prices = price_fetcher.get_set_prices(card_set_code, foil=True)
     cards = card_set['cards']
     for card in cards:
         name = card['name']
@@ -152,15 +180,20 @@ with open('AllSets.json') as data_file:
         rules_text, flavor_text = get_card_text(card)
         power, toughness = get_power_and_toughness(card)
         collector_number = card['number']
+        layout_type, ordered_card_names, is_focal_card = get_layout_type(card)
         multiverse_id, image_path = download_image(name, card)
         stock = 0
         language = 'en'
         foil_possibilities = (False, True)
         for foil in foil_possibilities:
-            price = get_price(card_set_name, name, foil, collector_number)
-            db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
-                           rarity, artist, rules_text, flavor_text, power, toughness, collector_number, multiverse_id,
-                           image_path, stock, price, color_identity)
+            for condition in ('NM', 'SP', 'MP', 'HP'):
+                price = get_price(name, foil, layout_type, is_focal_card, ordered_card_names, condition,
+                                  non_foil_prices, foil_prices)
+                print(name + ' - ' + condition + ' - ' + str(foil) + ' - ' + str(price))
+                #TODO: change the database calls to not update database on every call as well as handle the new fields
+                # db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
+                #                rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
+                #                multiverse_id, image_path, stock, price, color_identity)
 
 finish_time = time.time()
 finish_time_string = datetime.datetime.fromtimestamp(int(finish_time)).strftime('%Y-%m-%d %H:%M:%S')
