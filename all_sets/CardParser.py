@@ -158,12 +158,12 @@ def get_layout_type(card):
             is_focal_card = True
         else:
             is_focal_card = False
-    return layout_type, ordered_card_names, is_focal_card
+    return layout_type, json.dumps(ordered_card_names), is_focal_card
 
 
 with open('AllSets.json') as data_file:
     data = json.load(data_file)
-    card_set = data['AKH']
+    card_set = data['BFZ']
     card_set_code = card_set['code']
     price_fetcher = PriceFetcher()
     non_foil_prices = price_fetcher.get_set_prices(card_set_code)
@@ -190,10 +190,12 @@ with open('AllSets.json') as data_file:
                 price = get_price(name, foil, layout_type, is_focal_card, ordered_card_names, condition,
                                   non_foil_prices, foil_prices)
                 print(name + ' - ' + condition + ' - ' + str(foil) + ' - ' + str(price))
-                #TODO: change the database calls to not update database on every call as well as handle the new fields
-                # db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
-                #                rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
-                #                multiverse_id, image_path, stock, price, color_identity)
+                db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
+                               rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
+                               multiverse_id, image_path, stock, price, color_identity, layout_type,
+                               ordered_card_names, is_focal_card, condition)
+        print('inserted ' + name)
+    db.update_database()
 
 finish_time = time.time()
 finish_time_string = datetime.datetime.fromtimestamp(int(finish_time)).strftime('%Y-%m-%d %H:%M:%S')
