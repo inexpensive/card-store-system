@@ -41,7 +41,7 @@ class Card(models.Model):
     super_types = JSONField()
     types = JSONField()
     sub_types = JSONField()
-    mana_cost = models.CharField(max_length=20)
+    mana_cost = models.CharField(max_length=100)
     cmc = models.SmallIntegerField()
     card_language = models.CharField(max_length=15)
     rules_text = models.TextField()
