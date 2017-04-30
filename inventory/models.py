@@ -55,8 +55,11 @@ class Card(models.Model):
     rarity = models.CharField(max_length=1, choices=RARITIES)
     condition = models.CharField(max_length=2, choices=CONDITIONS)
     foil = models.BooleanField()
-    power = models.SmallIntegerField()
-    toughness = models.SmallIntegerField()
+    power = models.CharField(max_length=5)
+    toughness = models.CharField(max_length=5)
+
+    class Meta:
+        unique_together = ('name', 'set', 'card_language', 'condition', 'foil', 'collector_number', 'multiverse_id')
 
     def __str__(self):
         return self.name
