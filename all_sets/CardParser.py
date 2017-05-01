@@ -30,17 +30,30 @@ def get_types(card):
     subtypes_array = []
     if 'subtypes' in keys:
         subtypes_array = card['subtypes']
-    supertypes_json = json.dumps(supertypes_array)
-    types_json = json.dumps(types_array)
-    subtypes_json = json.dumps(subtypes_array)
-    return supertypes_json, types_json, subtypes_json
+    return supertypes_array, types_array, subtypes_array
+
+
+def convert_color_to_single_character(color):
+    if color == 'Blue':
+        color = 'U'
+    else:
+        color = color[0]
+    return color
+
+
+def join_with_spaces(color_array):
+    return ' '.join(color_array)
 
 
 def get_color(card):
-    color_array = ['Colorless']
+    color_array = ['C']
+    color_text = 'Colorless'
     if 'colors' in card.keys():
         color_array = card['colors']
-    return json.dumps(color_array)
+        color_text = join_with_spaces(color_array)
+    for i in range(color_array.__len__()):
+        color_array[i] = convert_color_to_single_character(color_array[i])
+    return color_array, color_text
 
 
 def get_card_text(card):
@@ -144,7 +157,7 @@ def get_color_identity(card):
         color_identity = card['colorIdentity']
     else:
         color_identity = ['C']
-    return json.dumps(color_identity)
+    return color_identity
 
 
 def get_layout_type(card):
@@ -158,43 +171,49 @@ def get_layout_type(card):
             is_focal_card = True
         else:
             is_focal_card = False
-    return layout_type, json.dumps(ordered_card_names), is_focal_card
+    return layout_type, ordered_card_names, is_focal_card
 
 
 with open('AllSets.json') as data_file:
     data = json.load(data_file)
-    card_set = data['BFZ']
-    card_set_code = card_set['code']
-    price_fetcher = PriceFetcher()
-    non_foil_prices = price_fetcher.get_set_prices(card_set_code)
-    foil_prices = price_fetcher.get_set_prices(card_set_code, foil=True)
-    cards = card_set['cards']
-    for card in cards:
-        name = card['name']
-        supertypes, types, subtypes = get_types(card)
-        mana_cost, cmc = get_mana_cost(card)
-        color = get_color(card)
-        color_identity = get_color_identity(card)
-        rarity = card['rarity'][0]
-        artist = card['artist']
-        rules_text, flavor_text = get_card_text(card)
-        power, toughness = get_power_and_toughness(card)
-        collector_number = card['number']
-        layout_type, ordered_card_names, is_focal_card = get_layout_type(card)
-        multiverse_id, image_path = download_image(name, card)
-        stock = 0
-        language = 'en'
-        foil_possibilities = (False, True)
-        for foil in foil_possibilities:
-            for condition in ('NM', 'SP', 'MP', 'HP'):
-                price = get_price(name, foil, layout_type, is_focal_card, ordered_card_names, condition,
-                                  non_foil_prices, foil_prices)
-                print(name + ' - ' + condition + ' - ' + str(foil) + ' - ' + str(price))
-                db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
-                               rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
-                               multiverse_id, image_path, stock, price, color_identity, layout_type,
-                               ordered_card_names, is_focal_card, condition)
-        print('inserted ' + name)
+    card_sets = ['AER', 'AKH', 'BFZ', 'EMN', 'KLD', 'MM3', 'OGW', 'SOI']
+    for set_ in card_sets:
+        card_set = data[set_]
+        card_set_code = card_set['code']
+        price_fetcher = PriceFetcher()
+        non_foil_prices = price_fetcher.get_set_prices(card_set_code)
+        foil_prices = price_fetcher.get_set_prices(card_set_code, foil=True)
+        cards = card_set['cards']
+        for card in cards:
+            name = card['name']
+            supertypes, types, subtypes = get_types(card)
+            supertypes_text = join_with_spaces(supertypes)
+            types_text = join_with_spaces(types)
+            subtypes_text = join_with_spaces(subtypes)
+            mana_cost, cmc = get_mana_cost(card)
+            color, color_text = get_color(card)
+            color_identity = get_color_identity(card)
+            rarity = card['rarity'][0]
+            artist = card['artist']
+            rules_text, flavor_text = get_card_text(card)
+            power, toughness = get_power_and_toughness(card)
+            collector_number = card['number']
+            layout_type, ordered_card_names, is_focal_card = get_layout_type(card)
+            multiverse_id, image_path = download_image(name, card)
+            stock = 0
+            language = 'en'
+            foil_possibilities = (False, True)
+            for foil in foil_possibilities:
+                for condition in ('NM', 'SP', 'MP', 'HP'):
+                    price = get_price(name, foil, layout_type, is_focal_card, ordered_card_names, condition,
+                                      non_foil_prices, foil_prices)
+                    print(name + ' - ' + condition + ' - ' + str(foil) + ' - ' + str(price))
+                    db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
+                                   rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
+                                   multiverse_id, image_path, stock, price, color_identity, layout_type,
+                                   ordered_card_names, is_focal_card, condition, supertypes_text, types_text, subtypes_text,
+                                   color_text)
+            print('inserted ' + name)
     db.update_database()
 
 finish_time = time.time()
