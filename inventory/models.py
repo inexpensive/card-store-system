@@ -1,4 +1,4 @@
-from django.contrib.postgres.fields import JSONField
+from django.contrib.postgres.fields import JSONField, ArrayField
 from django.db import models
 from django.utils import timezone
 import datetime
@@ -31,16 +31,29 @@ class Card(models.Model):
         ('HP', 'Heavily Played')
     )
 
+    COLORS = (
+        ('W', 'White'),
+        ('U', 'Blue'),
+        ('B', 'Black'),
+        ('R', 'Red'),
+        ('G', 'Green'),
+        ('C', 'Colorless'),
+    )
+
     name = models.CharField(max_length=170)
     set = models.ForeignKey(Set)
-    color = JSONField()
-    color_identity = JSONField()
+    color = ArrayField(models.CharField(max_length=1, choices=COLORS))
+    color_text = models.CharField(max_length=50)
+    color_identity = ArrayField(models.CharField(max_length=1, choices=COLORS))
     layout_type = models.CharField(max_length=50)
-    ordered_card_names = JSONField()
+    ordered_card_names = ArrayField(models.CharField(max_length=170), blank=True)
     is_focal_card = models.BooleanField()
-    super_types = JSONField()
-    types = JSONField()
-    sub_types = JSONField()
+    super_types = ArrayField(models.CharField(max_length=40), blank=True)
+    super_types_text = models.CharField(max_length=100)
+    types = ArrayField(models.CharField(max_length=40), blank=True)
+    types_text = models.CharField(max_length=100)
+    sub_types = ArrayField(models.CharField(max_length=40), blank=True)
+    sub_types_text = models.CharField(max_length=100)
     mana_cost = models.CharField(max_length=100)
     cmc = models.SmallIntegerField()
     card_language = models.CharField(max_length=15)
