@@ -49,18 +49,19 @@ def cardset(request, set_id):
     return render(request, 'inventory/cardlist.html', {'card_list': card_list})
 
 
-def search(request, query):
-    print(query)
-    vector = SearchVector('name', weight='A') + \
-             SearchVector('super_types_text', 'types_text', 'sub_types_text', weight='B') + \
-             SearchVector('rules_text', weight='C') + \
-        SearchVector('color_text', 'power', 'toughness', 'artist', 'flavor_text', weight='D')
-    search_query = SearchQuery(query)
-    card_list = Card.objects.annotate(
-        search=vector,
-        rank=SearchRank(vector, search_query)
-    ).filter(search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
-    return render(request, 'inventory/cardlist.html', {'card_list': card_list})
+def search(request):
+    if request.method == 'GET':
+        query = request.GET.get('card_search_box', None)
+        vector = SearchVector('name', weight='A') + \
+            SearchVector('super_types_text', 'types_text', 'sub_types_text', weight='B') + \
+            SearchVector('rules_text', weight='C') + \
+            SearchVector('color_text', 'power', 'toughness', 'artist', 'flavor_text', weight='D')
+        search_query = SearchQuery(query)
+        card_list = Card.objects.annotate(
+            search=vector,
+            rank=SearchRank(vector, search_query)
+        ).filter(search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
+        return render(request, 'inventory/cardlist.html', {'card_list': card_list})
 
 
 def results(request, question_id):

@@ -7,5 +7,5 @@ urlpatterns = [
     # ex: /inv/5/results
     url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
     # ex: /inv/search/query
-    url(r'^search/(?P<query>.+)/$', views.search, name='search'),
+    url(r'^search/.*$', views.search, name='search'),
 ]

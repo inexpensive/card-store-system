@@ -1,7 +1,10 @@
 {% load staticfiles %}
 <link rel="stylesheet" type="text/css" href="{% static 'inventory/style.css' %}" />
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<form type="get" action="."
+<form type="get" action="/inv/search/" style="margin: 0">
+    <input id="card_search_box" type="text" name="card_search_box" placeholder="Search for a card..." >
+    <button id="search_submit" type="submit">Submit</button>
+</form>
 {% if set_list %}
     <ul>
         {% for set in set_list %}
