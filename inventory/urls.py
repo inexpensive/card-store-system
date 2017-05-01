@@ -3,9 +3,9 @@ from . import views
 urlpatterns = [
     url(r'^$', views.index, name='index'),
     # ex: /inv/5/
-    url(r'^(?P<set_id>[0-9]+)/$', views.cardset, name='cardset'),
-    # ex: /inv/5/results
-    url(r'^(?P<question_id>[0-9]+)/results/$', views.results, name='results'),
-    # ex: /inv/search/query
+    url(r'^set/(?P<set_id>[0-9]+)/$', views.cardset, name='cardset'),
+    # ex: /inv/card/5
+    url(r'^card/(?P<card_id>[0-9]+)/$', views.card_details, name='card_details'),
+    # ex: /inv/search/card_search_box=island
     url(r'^search/.*$', views.search, name='search'),
 ]

@@ -13,7 +13,7 @@
         {% for card in card_list %}
             <tr>
                 <td class="fit"><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
-                <td>{{ card.name }}</td>
+                <td><a href="{% url 'inventory:card_details' card.id %}">{{ card.name }}</a></td>
                 <td>{{ card.set.code }}</td>
                 <td>{{ card.stock }}</td>
                 <td>${{ card.price|floatformat:2 }}</td>

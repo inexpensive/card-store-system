@@ -30,9 +30,9 @@ class SearchView(generic.ListView):
         return Card.objects
 
 
-class ResultsView(generic.DetailView):
+class CardDetailsView(generic.DetailView):
     model = Card
-    template_name = 'inventory/results.html'
+    template_name = 'inventory/carddetails.html'
 
 
 def index(request):
@@ -64,6 +64,6 @@ def search(request):
         return render(request, 'inventory/cardlist.html', {'card_list': card_list})
 
 
-def results(request, question_id):
-    question = get_object_or_404(Card, pk=question_id)
-    return render(request, 'inventory/results.html', {'question': question})
+def card_details(request, card_id):
+    card = get_object_or_404(Card, pk=card_id)
+    return render(request, 'inventory/carddetails.html', {'card': card})
