@@ -8,4 +8,6 @@ urlpatterns = [
     url(r'^card/(?P<card_id>[0-9]+)/$', views.card_details, name='card_details'),
     # ex: /inv/search/card_search_box=island
     url(r'^search/.*$', views.search, name='search'),
+    # ex: /inv/autocomplete/
+    url(r'^autocomplete/.*$', views.autocomplete, name='autocomplete')
 ]

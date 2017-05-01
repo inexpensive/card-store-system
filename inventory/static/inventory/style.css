@@ -9,6 +9,11 @@
     width: 1%;
 }
 
+img.searchbox{
+    height: 128px;
+    width: auto;
+}
+
 img.icon {
     height: 16px;
     width: auto;

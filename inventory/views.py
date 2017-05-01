@@ -1,8 +1,14 @@
+import json
+from pprint import pprint
+
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.db.models import Q
+from django.http import HttpResponse
 from django.template import loader
 from django.shortcuts import render, get_list_or_404, get_object_or_404
 from django.views import generic
+
+from inventory.templatetags.card_filters import replace_symbols
 from .models import Card, Set
 
 
@@ -62,6 +68,27 @@ def search(request):
             rank=SearchRank(vector, search_query)
         ).filter(search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
         return render(request, 'inventory/cardlist.html', {'card_list': card_list})
+
+
+def autocomplete(request):
+    if request.is_ajax():
+        q = request.GET.get('term', '')
+        cards = Card.objects.filter(name__icontains=q, condition='NM', foil=False)[:10]
+        results = []
+        for card in cards:
+            card_json = {
+                'label': card.name,
+                'value': card.name,
+                'desc': replace_symbols(card.rules_text),
+                'id': card.id,
+                'image': str(card.image),
+            }
+            results.append(card_json)
+        data = json.dumps(results)
+    else:
+        data = 'fail'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
 
 
 def card_details(request, card_id):
