@@ -1,4 +1,6 @@
 import re
+
+import yaml
 from forex_python.converter import CurrencyRates
 import requests
 from bs4 import BeautifulSoup
@@ -34,14 +36,13 @@ def get_price_markup_from_mtg_goldfish(url):
         return []
 
 
-def get_mtg_goldfish_set_code_exception(set):
-    exceptions = {
-        'MPS_AKH': 'MS3',
-    }
-    if set in exceptions.keys():
-        return exceptions[set]
+def get_mtg_goldfish_set_code_exception(set_):
+    with open('../mtg_goldfish_exceptions.yaml') as file:
+        exceptions = yaml.load(file)
+    if set_ in exceptions.keys():
+        return exceptions[set_]
     else:
-        return set
+        return set_
 
 
 class PriceFetcher:
@@ -56,9 +57,9 @@ class PriceFetcher:
     def convert_to_cad(self, price):
         return price * self.exchange_rate
 
-    def get_set_prices(self, set, price_adjustment=1, foil=False):
-        set = get_mtg_goldfish_set_code_exception(set)
-        url = 'https://www.mtggoldfish.com/index/{0}'.format(set)
+    def get_set_prices(self, set_, price_adjustment=1, foil=False):
+        set_ = get_mtg_goldfish_set_code_exception(set_)
+        url = 'https://www.mtggoldfish.com/index/{0}'.format(set_)
         if foil:
             url += '_F'
         table_rows = get_price_markup_from_mtg_goldfish(url)
