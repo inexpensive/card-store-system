@@ -43,5 +43,6 @@ class Database:
               'collector_number, multiverse_id, image, stock, price, color_identity, layout_type, ' \
               'ordered_card_names, is_focal_card, condition, super_types_text, types_text, sub_types_text, ' \
               'color_text) VALUES (%s,(SELECT id from inventory_set WHERE code = %s), %s, %s, %s, ' \
-              '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)'
+              '%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s) ' \
+              'ON CONFLICT DO NOTHING'
         self.execute_sql(sql, args)
