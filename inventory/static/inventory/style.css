@@ -17,4 +17,5 @@ img.searchbox{
 img.icon {
     height: 16px;
     width: auto;
+    vertical-align: text-top;
 }
