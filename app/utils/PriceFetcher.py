@@ -34,6 +34,16 @@ def get_price_markup_from_mtg_goldfish(url):
         return []
 
 
+def get_mtg_goldfish_set_code_exception(set):
+    exceptions = {
+        'MPS_AKH': 'MS3',
+    }
+    if set in exceptions.keys():
+        return exceptions[set]
+    else:
+        return set
+
+
 class PriceFetcher:
     def __init__(self):
         self.exchange_rate = None
@@ -47,6 +57,7 @@ class PriceFetcher:
         return price * self.exchange_rate
 
     def get_set_prices(self, set, price_adjustment=1, foil=False):
+        set = get_mtg_goldfish_set_code_exception(set)
         url = 'https://www.mtggoldfish.com/index/{0}'.format(set)
         if foil:
             url += '_F'

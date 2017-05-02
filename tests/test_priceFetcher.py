@@ -1,5 +1,5 @@
 from unittest import TestCase
-from app.utils.PriceFetcher import PriceFetcher, round_price
+from app.utils.PriceFetcher import PriceFetcher, round_price, get_mtg_goldfish_set_code_exception
 
 
 class TestPriceFetcher(TestCase):
@@ -52,3 +52,9 @@ class TestPriceFetcher(TestCase):
         self.assertAlmostEqual(round_price(8.33), 8.49)
         self.assertAlmostEqual(round_price(27.44), 26.99)
         self.assertAlmostEqual(round_price(277.55), 279.99)
+
+    def test_get_mtg_goldfish_set_code_exception(self):
+        good_set = 'BFZ'
+        bad_set = 'MPS_AKH'
+        self.assertEqual(get_mtg_goldfish_set_code_exception(good_set), good_set)
+        self.assertNotEqual(get_mtg_goldfish_set_code_exception(bad_set), bad_set)
