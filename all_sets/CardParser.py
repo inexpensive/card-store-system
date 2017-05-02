@@ -3,6 +3,9 @@ import os
 from urllib.request import urlretrieve
 import time
 import datetime
+
+import yaml
+
 from app.utils.Database import Database
 import re
 
@@ -77,7 +80,7 @@ def get_power_and_toughness(card):
 
 
 def download_image(name, card):
-    multiverse_id = ''
+    multiverse_id = -1
     image_path = os.path.abspath('../inventory/static/images/None/no_art.jpg')
     if 'multiverseid' in card.keys():
         multiverse_id = card['multiverseid']
@@ -90,7 +93,7 @@ def download_image(name, card):
             image_URL = 'http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card'.format(
                 multiverse_id)
             urlretrieve(image_URL, image_path)
-        image_path = re.search("/images.*", image_path).group(0)
+    image_path = re.search("/images.*", image_path).group(0)
     return multiverse_id, image_path
 
 
@@ -174,12 +177,28 @@ def get_layout_type(card):
     return layout_type, ordered_card_names, is_focal_card
 
 
+def get_number(card):
+    if 'number' in card.keys():
+        return card['number']
+    elif 'mciNumber' in card.keys():
+        return card['mciNumber']
+    else:
+        return '0'
+
+
+with open('../online_only_sets.yaml') as f:
+    online_only_sets = yaml.load(f)
+
 with open('AllSets.json') as data_file:
     data = json.load(data_file)
-    card_sets = ['AER', 'AKH', 'BFZ', 'EMN', 'KLD', 'MM3', 'OGW', 'SOI']
+    card_sets = data.keys()
     for set_ in card_sets:
         card_set = data[set_]
         card_set_code = card_set['code']
+        print('starting ' + card_set_code)
+        if card_set_code in online_only_sets:
+            print('skipping ' + card_set_code)
+            continue
         price_fetcher = PriceFetcher()
         non_foil_prices = price_fetcher.get_set_prices(card_set_code)
         foil_prices = price_fetcher.get_set_prices(card_set_code, foil=True)
@@ -197,7 +216,7 @@ with open('AllSets.json') as data_file:
             artist = card['artist']
             rules_text, flavor_text = get_card_text(card)
             power, toughness = get_power_and_toughness(card)
-            collector_number = card['number']
+            collector_number = get_number(card)
             layout_type, ordered_card_names, is_focal_card = get_layout_type(card)
             multiverse_id, image_path = download_image(name, card)
             stock = 0
@@ -207,14 +226,13 @@ with open('AllSets.json') as data_file:
                 for condition in ('NM', 'SP', 'MP', 'HP'):
                     price = get_price(name, foil, layout_type, is_focal_card, ordered_card_names, condition,
                                       non_foil_prices, foil_prices)
-                    print(name + ' - ' + condition + ' - ' + str(foil) + ' - ' + str(price))
                     db.insert_card(name, card_set_code, language, foil, supertypes, types, subtypes, mana_cost, cmc, color,
                                    rarity, artist, rules_text, flavor_text, power, toughness, collector_number,
                                    multiverse_id, image_path, stock, price, color_identity, layout_type,
                                    ordered_card_names, is_focal_card, condition, supertypes_text, types_text, subtypes_text,
                                    color_text)
-            print('inserted ' + name)
-    db.update_database()
+        db.update_database()
+        print('done with ' + card_set_code)
 
 finish_time = time.time()
 finish_time_string = datetime.datetime.fromtimestamp(int(finish_time)).strftime('%Y-%m-%d %H:%M:%S')
