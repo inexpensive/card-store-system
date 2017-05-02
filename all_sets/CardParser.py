@@ -169,11 +169,15 @@ def get_layout_type(card):
         ordered_card_names = []
         is_focal_card = True
     else:
-        ordered_card_names = card['names']
-        if card['name'] == ordered_card_names[0]:
-            is_focal_card = True
+        if 'names' in card.keys():
+            ordered_card_names = card['names']
+            if card['name'] == ordered_card_names[0]:
+                is_focal_card = True
+            else:
+                is_focal_card = False
         else:
-            is_focal_card = False
+            ordered_card_names = []
+            is_focal_card = True
     return layout_type, ordered_card_names, is_focal_card
 
 
