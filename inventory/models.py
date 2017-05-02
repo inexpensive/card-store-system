@@ -55,7 +55,7 @@ class Card(models.Model):
     sub_types = ArrayField(models.CharField(max_length=40), blank=True)
     sub_types_text = models.CharField(max_length=100)
     mana_cost = models.CharField(max_length=100)
-    cmc = models.SmallIntegerField()
+    cmc = models.IntegerField()
     card_language = models.CharField(max_length=15)
     rules_text = models.TextField()
     flavor_text = models.TextField()
@@ -64,7 +64,8 @@ class Card(models.Model):
     artist = models.CharField(max_length=100)
     stock = models.IntegerField()
     price = models.FloatField()
-    image = models.ImageField(upload_to='templates/images/', default='templates/images/None/nothing.img')
+    image = models.ImageField(upload_to='templates/images/', default='templates/images/None/nothing.img',
+                              max_length=300)
     rarity = models.CharField(max_length=1, choices=RARITIES)
     condition = models.CharField(max_length=2, choices=CONDITIONS)
     foil = models.BooleanField()
