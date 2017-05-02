@@ -1,38 +1,12 @@
-{% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'inventory/style.css' %}" />
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-<link rel="stylesheet" href="http://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" type="text/css" media="all" />
-<script src="https://code.jquery.com/jquery-1.12.4.js" type="text/javascript"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js" type="text/javascript"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
-        var card_input = $("#card_search_box");
-        card_input.autocomplete({
-            source: "/inv/autocomplete/",
-            minLength: 2,
-            select: function (event, ui) {
-                $("#card_search_box").val(ui.item.label);
-                $("#search_form").submit();
-            }
-        })
-        .autocomplete("instance")._renderItem = function(ul, item) {
-            return $("<li>")
-                .append("<table><tr><td class=\"fit\" rowspan=\"2\"><img class=\"searchbox\"src=\"/static" + item.image +"\"></td><td>" + item.label + "</td></tr><tr><td>" + item.desc.replace(/\n/g, "<br>") + "</td></tr></table>")
-{#                .append("<div>" + item.label + "<br>" + item.desc.replace("\n", "<br>", "g") + "</div>")#}
-                .appendTo(ul);
-        };
-    })
-</script>
-<form id="search_form" name="search_form" type="get" action="/inv/search/" style="margin: 0">
-    <input id="card_search_box" type="text" name="card_search_box" placeholder="Search for a card..." >
-    <button id="search_submit" type="submit">Submit</button>
-</form>
-{% if set_list %}
-    <ul>
-        {% for set in set_list %}
-            <li><a href="{% url 'inventory:cardset' set.id %}">{{ set }}</a></li>
-        {% endfor %}
-    </ul>
-{% else %}
-<p>There aren't any sets!!</p>
-{% endif %}
+{% extends "inventory/base.html" %}
+{% block content %}
+    {% if set_list %}
+        <ul>
+            {% for set in set_list %}
+                <li><a href="{% url 'inventory:cardset' set.id %}">{{ set }}</a></li>
+            {% endfor %}
+        </ul>
+    {% else %}
+    <p>There aren't any sets!!</p>
+    {% endif %}
+{% endblock %}

@@ -1,25 +1,26 @@
+{% extends "inventory/base.html" %}
 {% load staticfiles %}
-<link rel="stylesheet" type="text/css" href="{% static 'inventory/style.css' %}" />
-<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
-{% if card_list %}
-    <table class="table table-hover table-striped table-small">
-        <tr>
-            <th class="fit"></th>
-            <th>Name</th>
-            <th>Set</th>
-            <th>Stock</th>
-            <th>Price</th>
-        </tr>
-        {% for card in card_list %}
+{% block content %}
+    {% if card_list %}
+        <table class="table table-hover table-striped table-small">
             <tr>
-                <td class="fit"><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
-                <td><a href="{% url 'inventory:card_details' card.id %}">{{ card.name }}</a></td>
-                <td>{{ card.set.code }}</td>
-                <td>{{ card.stock }}</td>
-                <td>${{ card.price|floatformat:2 }}</td>
+                <th class="fit"></th>
+                <th>Name</th>
+                <th>Set</th>
+                <th>Stock</th>
+                <th>Price</th>
             </tr>
-        {% endfor %}
-    </table>
-{% else %}
-<p>There aren't any cards!!</p>
-{% endif %}
+            {% for card in card_list %}
+                <tr>
+                    <td class="fit"><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
+                    <td><a href="{% url 'inventory:card_details' card.id %}">{{ card.name }}</a></td>
+                    <td>{{ card.set.code }}</td>
+                    <td>{{ card.stock }}</td>
+                    <td>${{ card.price|floatformat:2 }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+    <p>There aren't any cards!!</p>
+    {% endif %}
+{% endblock %}
