@@ -4,6 +4,8 @@ from urllib.request import urlretrieve
 import time
 import datetime
 
+import requests
+import shutil
 import yaml
 
 from app.utils.Database import Database
@@ -92,7 +94,11 @@ def download_image(name, card):
                 os.makedirs(directory)
             image_URL = 'http://gatherer.wizards.com/Handlers/Image.ashx?multiverseid={0}&type=card'.format(
                 multiverse_id)
-            urlretrieve(image_URL, image_path)
+            # urlretrieve(image_URL, image_path)
+            r = requests.get(image_URL, stream=True)
+            with open(image_path, 'wb') as out_file:
+                shutil.copyfileobj(r.raw, out_file)
+            del r
     image_path = re.search("/images.*", image_path).group(0)
     return multiverse_id, image_path
 
@@ -185,7 +191,10 @@ def get_number(card):
     if 'number' in card.keys():
         return card['number']
     elif 'mciNumber' in card.keys():
-        return card['mciNumber']
+        collector_number = card['mciNumber']
+        if '4e/en/' in collector_number:
+            collector_number = collector_number[6:]
+        return collector_number
     else:
         return '0'
 
