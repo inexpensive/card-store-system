@@ -18,4 +18,7 @@ end
 $$;
 
 
-CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON inventory_card FOR EACH ROW EXECUTE PROCEDURE card_search_trigger();
+CREATE TRIGGER tsvectorupdate
+BEFORE INSERT OR
+UPDATE OF name, super_types_text, types_text, sub_types_text, rules_text, color_text, power, toughness, artist, flavor_text
+ON inventory_card FOR EACH ROW EXECUTE PROCEDURE card_search_trigger();;
