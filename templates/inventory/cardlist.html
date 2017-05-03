@@ -2,6 +2,25 @@
 {% load staticfiles %}
 {% block content %}
     {% if card_list %}
+        <div class="pagination">
+            <span class="step-links">
+                {% if card_list.has_previous %}
+                    {% block prev_page_top %}
+                        <a href="?page={{ card_list.previous_page_number }}">previous</a>
+                    {% endblock %}
+                {% endif %}
+
+                <span class="current">
+                    Page {{ card_list.number }} of {{ card_list.paginator.num_pages }}
+                </span>
+
+                {% if card_list.has_next %}
+                    {% block next_page_top %}
+                        <a href="?page={{ card_list.next_page_number }}">next</a>
+                    {% endblock %}
+                {% endif %}
+            </span>
+        </div>
         <table class="table table-hover table-striped table-small">
             <tr>
                 <th class="fit"></th>
@@ -14,12 +33,31 @@
                 <tr>
                     <td class="fit"><img src="{% static card.image %}" alt="{{ card.name }}" class="stock-table-image"/></td>
                     <td><a href="{% url 'inventory:card_details' card.id %}">{{ card.name }}</a></td>
-                    <td>{{ card.set.code }}</td>
+                    <td><a href="{% url 'inventory:cardset' card.set.id %}">{{ card.set }}</a></td>
                     <td>{{ card.stock }}</td>
                     <td>${{ card.price|floatformat:2 }}</td>
                 </tr>
             {% endfor %}
         </table>
+        <div class="pagination">
+            <span class="step-links">
+                {% if card_list.has_previous %}
+                    {% block prev_page_bottom %}
+                        <a href="?page={{ card_list.previous_page_number }}">previous</a>
+                    {% endblock %}
+                {% endif %}
+
+                <span class="current">
+                    Page {{ card_list.number }} of {{ card_list.paginator.num_pages }}
+                </span>
+
+                {% if card_list.has_next %}
+                    {% block next_page_bottom %}
+                        <a href="?page={{ card_list.next_page_number }}">next</a>
+                    {% endblock %}
+                {% endif %}
+            </span>
+        </div>
     {% else %}
     <p>There aren't any cards!!</p>
     {% endif %}

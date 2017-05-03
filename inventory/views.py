@@ -2,6 +2,7 @@ import json
 from pprint import pprint
 
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
+from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
 from django.db.models import Q
 from django.http import HttpResponse
 from django.template import loader
@@ -52,7 +53,15 @@ def index(request):
 
 def cardset(request, set_id):
     card_list = get_list_or_404(Card.objects.order_by('name'), set=set_id, foil=False, condition='NM')
-    return render(request, 'inventory/cardlist.html', {'card_list': card_list})
+    paginator = Paginator(card_list, 25)
+    page = request.GET.get('page')
+    try:
+        cards = paginator.page(page)
+    except PageNotAnInteger:
+        cards = paginator.page(1)
+    except EmptyPage:
+        cards = paginator.page(paginator.num_pages)
+    return render(request, 'inventory/cardlist.html', {'card_list': cards})
 
 
 def search(request):
@@ -66,15 +75,26 @@ def search(request):
         card_list = Card.objects.annotate(
             search=vector,
             rank=SearchRank(vector, search_query)
-        ).filter(search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
-        return render(request, 'inventory/cardlist.html', {'card_list': card_list})
+        ).filter(card_search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
+        print(card_list.query)
+        paginator = Paginator(card_list, 25)
+        page = request.GET.get('page')
+        try:
+            cards = paginator.page(page)
+        except PageNotAnInteger:
+            cards = paginator.page(1)
+        except EmptyPage:
+            cards = paginator.page(paginator.num_pages)
+        return render(request, 'inventory/search.html', {'card_list': cards, 'query': query})
 
 
 def autocomplete(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        cards = Card.objects.filter(name__icontains=q, condition='NM', foil=False).order_by('name').distinct(
-            'name')[:10]
+        cards = Card.objects\
+                    .filter(name__icontains=q, condition='NM', foil=False)\
+                    .exclude(image='/images/None/no_art.jpg')\
+                    .order_by('name', 'set__release_date').distinct('name')[:10]
         results = []
         for card in cards:
             card_json = {

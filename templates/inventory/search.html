@@ -1,0 +1,13 @@
+{% extends "inventory/cardlist.html" %}
+{% block prev_page_top %}
+    <a href="?page={{ card_list.previous_page_number }}">back</a>
+{% endblock %}
+{% block next_page_top %}
+    <a href="?page={{ card_list.next_page_number }}">forward</a>
+{% endblock %}
+{% block prev_page_bottom %}
+    <a href="?page={{ card_list.previous_page_number }}">back</a>
+{% endblock %}
+{% block next_page_bottom %}
+    <a href="?page={{ card_list.next_page_number }}">forward</a>
+{% endblock %}

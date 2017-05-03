@@ -1,0 +1,21 @@
+You need to run these commands in postgres to make the card search indexing work:
+
+CREATE FUNCTION card_search_trigger() RETURNS trigger
+LANGUAGE plpgsql
+AS $$
+begin
+    new.card_search :=
+	    (((setweight(to_tsvector(COALESCE(new."name", '' )), 'A') ||
+        setweight(to_tsvector(COALESCE(new."super_types_text", '' ) || ' '
+        || COALESCE(new."types_text", '' ) || ' '
+        || COALESCE(new."sub_types_text", '' )), 'B')) ||
+        setweight(to_tsvector(COALESCE(new."rules_text", '' )), 'C'))
+        || setweight(to_tsvector(COALESCE(new."color_text", '' ) ||
+        ' ' || COALESCE(new."power", '' ) || ' ' || COALESCE(new."toughness", '' ) ||
+        ' ' || COALESCE(new."artist", '' ) || ' ' || COALESCE(new."flavor_text", '' )), 'D'));
+    return new;
+end
+$$;
+
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON inventory_card FOR EACH ROW EXECUTE PROCEDURE card_search_trigger();

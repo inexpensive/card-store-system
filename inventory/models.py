@@ -1,4 +1,6 @@
 from django.contrib.postgres.fields import JSONField, ArrayField
+from django.contrib.postgres.indexes import GinIndex
+from django.contrib.postgres.search import SearchVectorField
 from django.db import models
 from django.utils import timezone
 import datetime
@@ -71,6 +73,7 @@ class Card(models.Model):
     foil = models.BooleanField()
     power = models.CharField(max_length=5)
     toughness = models.CharField(max_length=5)
+    card_search = SearchVectorField(db_index=True, null=True)
 
     class Meta:
         unique_together = ('name', 'set', 'card_language', 'condition', 'foil', 'collector_number', 'multiverse_id')
