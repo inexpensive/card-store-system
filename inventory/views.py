@@ -51,7 +51,7 @@ def index(request):
 
 
 def cardset(request, set_id):
-    card_list = get_list_or_404(Card.objects.order_by('multiverse_id'), set=set_id, foil=False, condition='NM')
+    card_list = get_list_or_404(Card.objects.order_by('name'), set=set_id, foil=False, condition='NM')
     return render(request, 'inventory/cardlist.html', {'card_list': card_list})
 
 
@@ -73,7 +73,8 @@ def search(request):
 def autocomplete(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        cards = Card.objects.filter(name__icontains=q, condition='NM', foil=False)[:10]
+        cards = Card.objects.filter(name__icontains=q, condition='NM', foil=False).order_by('name').distinct(
+            'name')[:10]
         results = []
         for card in cards:
             card_json = {
