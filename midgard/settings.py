@@ -11,8 +11,10 @@ https://docs.djangoproject.com/en/1.11/ref/settings/
 """
 
 import os
+import yaml
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
+
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 
@@ -25,7 +27,8 @@ SECRET_KEY = '+4%^8k%6h1&(=!xu1^x6plo2si$wveun@=vpiyq*l3_5=u(x+%'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.0.61', '156.57.51.175']
+with open('allowed_hosts.yaml') as f:
+    ALLOWED_HOSTS = yaml.load(f)
 
 
 # Application definition
@@ -76,14 +79,16 @@ WSGI_APPLICATION = 'midgard.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/1.11/ref/settings/#databases
 
+with open('config.yaml') as f:
+    db_settings = yaml.load(f)
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'midgard',
-        'USER': 'midgardadmin',
-        'PASSWORD': '*OD5xn*^0wYZsr1z@vAmeaj6hQ#uhj*5Rg@tDP96',
-        'HOST': 'localhost',
-        'PORT': '',
+        'NAME': db_settings['database_name'],
+        'USER': db_settings['database_user'],
+        'PASSWORD': db_settings['password'],
+        'HOST': db_settings['host'],
+        'PORT': db_settings['port'],
     }
 }
 

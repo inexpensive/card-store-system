@@ -2,4 +2,5 @@ all_sets/AllSets.json
 .idea
 images
 inventory/migrations
+allowed_hosts.yaml
 config.yaml
