@@ -16,7 +16,10 @@ Including another URLconf
 from django.conf.urls import include, url
 from django.contrib import admin
 
+import inventory.views
+
 urlpatterns = [
     url(r'^inv/', include('inventory.urls', namespace='inventory')),
+    url(r'^pricing/', inventory.views.pricing),
     url(r'^admin/', admin.site.urls),
 ]

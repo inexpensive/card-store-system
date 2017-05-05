@@ -115,3 +115,7 @@ def autocomplete(request):
 def card_details(request, card_id):
     card = get_object_or_404(Card, pk=card_id)
     return render(request, 'inventory/carddetails.html', {'card': card})
+
+
+def pricing(request):
+    return render(request, 'inventory/pricing.html')
