@@ -1,16 +1,17 @@
 import json
-from pprint import pprint
 
 from django.contrib.postgres.search import SearchVector, SearchQuery, SearchRank
 from django.core.paginator import Paginator, PageNotAnInteger, EmptyPage
-from django.db.models import Q
-from django.http import HttpResponse
+from django.contrib.auth import authenticate, login
+from django.contrib.auth.forms import UserCreationForm
+from django.http import HttpResponse, HttpResponseNotFound
 from django.template import loader
-from django.shortcuts import render, get_list_or_404, get_object_or_404
+from django.shortcuts import render, get_list_or_404, get_object_or_404, redirect
 from django.views import generic
 
 from inventory.templatetags.card_filters import replace_symbols
 from .models import Card, Set
+from .forms import UserForm, ProfileForm
 
 
 class IndexView(generic.ListView):
@@ -118,4 +119,30 @@ def card_details(request, card_id):
 
 
 def pricing(request):
-    return render(request, 'inventory/pricing.html')
+    if request.user is not None:
+        return render(request, 'inventory/pricing.html')
+    else:
+        return render(request, 'inventory/login.html')
+
+
+def signup(request):
+    if request.method == 'POST':
+        user_form = UserForm(request.POST)
+        profile_form = ProfileForm(request.POST)
+        if user_form.is_valid() and profile_form.is_valid():
+            user = user_form.save()
+            user_profile = profile_form.save(commit=False)
+            user_profile.user = user
+            user_profile.save()
+            username = user_form.cleaned_data.get('username')
+            raw_password = user_form.cleaned_data.get('password1')
+            user = authenticate(username=username, password=raw_password)
+            login(request, user)
+            return redirect('/inv/')
+    else:
+        user_form = UserForm()
+        profile_form = ProfileForm()
+    return render(request, 'inventory/signup.html', {
+        'user_form': user_form,
+        'profile_form': profile_form,
+    })

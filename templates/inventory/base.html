@@ -28,6 +28,15 @@
     <input id="card_search_box" type="text" name="card_search_box" placeholder="Search for a card..." >
     <button id="search_submit" type="submit">Submit</button>
 </form>
+<div id="login-status" class="pull-right">
+    {% if user.is_authenticated %}
+        Logged in as {{ user }}. <a href="{% url 'logout' %}">(logout)</a>
+    {% else %}
+        Note currently logged in.
+        <a href="{% url 'login' %}">Please Login</a>
+        <a href="{% url 'signup' %}">(signup)</a>
+    {% endif %}
+</div>
     {% block content %}
     {% endblock %}
 </body>

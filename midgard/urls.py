@@ -15,11 +15,15 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 
 import inventory.views
 
 urlpatterns = [
     url(r'^inv/', include('inventory.urls', namespace='inventory')),
+    url(r'^login', auth_views.login, name='login'),
+    url(r'^logout', auth_views.logout, {'next_page': '/inv/'}, name='logout'),
     url(r'^pricing/', inventory.views.pricing),
     url(r'^admin/', admin.site.urls),
+    url(r'^signup/$', inventory.views.signup, name='signup'),
 ]

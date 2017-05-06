@@ -1,10 +1,19 @@
-from django.contrib.postgres.fields import JSONField, ArrayField
-from django.contrib.postgres.indexes import GinIndex
+from django.contrib.auth.models import User
+from django.contrib.postgres.fields import ArrayField
 from django.contrib.postgres.search import SearchVectorField
 from django.db import models
-from django.utils import timezone
-import datetime
-import json
+
+
+class Profile(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    street_address = models.CharField(max_length=150, blank=True)
+    other_address = models.CharField(max_length=150, blank=True)
+    city = models.CharField(max_length=100, blank=True)
+    province = models.CharField(max_length=2, blank=True)
+    country = models.CharField(max_length=50, blank=True)
+    postal_code = models.CharField(max_length=10, blank=True)
+    birth_date = models.DateField(null=True, blank=True)
+    phone_number = models.CharField(max_length=20, blank=True)
 
 
 class Set(models.Model):
