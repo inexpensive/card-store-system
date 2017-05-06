@@ -119,10 +119,10 @@ def card_details(request, card_id):
 
 
 def pricing(request):
-    if request.user is not None:
+    if request.user.groups.filter(name='Employees').exists():
         return render(request, 'inventory/pricing.html')
     else:
-        return render(request, 'inventory/login.html')
+        return HttpResponseNotFound()
 
 
 def signup(request):
