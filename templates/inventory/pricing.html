@@ -7,93 +7,65 @@
 {% endblock %}
 {% block content %}
     <script src="{% static 'inventory/js/hoverphoto.js' %}" type="text/javascript"></script>
-    <table id="pricing-table" class="table table-striped">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Set</th>
-            <th>Condition</th>
-            <th>Non-Foil Price</th>
-            <th>Foil Price</th>
-        </tr>
-    </thead>
+    <table id="pricing-table" class="table table-striped table-bordered table-sm table-nonfluid">
     <tbody>
         <tr>
-            <td rowspan="12">Aven Mindcensor</td>
-            <td class="set-row" rowspan="4">
+            <th colspan="7">Aven Mindcensor</th>
+        </tr>
+       <tr>
+            <th>Set</th>
+            <td class="set-row" colspan="2">
                 <figure class="card-picture">
                     <img src="{% static 'images/AKH/Aven_Mindcensor_426707.jpg' %}">
                 </figure>
                 <i class="ss ss-akh ss-2x"></i> &#x2014; Amonkhet
             </td>
-            <td>NM</td>
-            <td>$1.99</td>
-            <td>$9.99</td>
-        </tr>
-        <tr>
-            <td>SP</td>
-            <td>$1.79</td>
-            <td>$8.99</td>
-        </tr>
-        <tr>
-            <td>MP</td>
-            <td>$1.49</td>
-            <td>$8.49</td>
-        </tr>
-        <tr>
-            <td>HP</td>
-            <td>$0.99</td>
-            <td>$4.89</td>
-        </tr>
-        <tr>
-            <td class="set-row" rowspan="4">
+            <td class="set-row" colspan="2">
                 <figure class="card-picture">
                     <img src="{% static 'images/MPS_AKH/Aven_Mindcensor_429861.jpg' %}">
                 </figure>
                 <i class="ss ss-mp2 ss-2x"></i> &#x2014; Amonkhet Invocations
             </td>
-            <td>NM</td>
-            <td>$40.99</td>
-            <td>N/A</td>
-        </tr>
-        <tr>
-            <td>SP</td>
-            <td>$36.99</td>
-            <td>N/A</td>
-        </tr>
-        <tr>
-            <td>MP</td>
-            <td>$29.99</td>
-            <td>N/A</td>
-        </tr>
-        <tr>
-            <td>HP</td>
-            <td>$19.99</td>
-            <td>N/A</td>
-        </tr>
-        <tr>
-            <td class="set-row" rowspan="4">
+            <td class="set-row" colspan="2">
                 <figure class="card-picture">
                     <img src="{% static 'images/FUT/Aven_Mindcensor_136204.jpg' %}">
                 </figure>
                 <i class="ss ss-fut ss-2x"></i> &#x2014; Future Sight
             </td>
-            <td>NM</td>
+        </tr>
+        <tr>
+            <th>NM</th>
+            <td>$1.99</td>
+            <td>($9.99)</td>
+            <td>$40.99</td>
+            <td>(N/A)</td>
             <td>$8.99</td>
             <td>$46.99</td>
         </tr>
         <tr>
-            <td>SP</td>
+            <th>SP</th>
+            <td>$1.79</td>
+            <td>($8.99)</td>
+            <td>$36.99</td>
+            <td>(N/A)</td>
             <td>$7.99</td>
             <td>$41.99</td>
         </tr>
         <tr>
-            <td>MP</td>
+            <th>MP</th>
+            <td>$1.49</td>
+            <td>($8.49)</td>
+            <td>$29.99</td>
+            <td>(N/A)</td>
             <td>$6.99</td>
             <td>$34.99</td>
         </tr>
         <tr>
-            <td>HP</td>
+            <th>HP</th>
+            <td>$0.99</td>
+            <td>($4.89)</td>
+            <td>$19.99</td>
+            <td>(N/A)</td>
             <td>$4.49</td>
             <td>$23.99</td>
         </tr>

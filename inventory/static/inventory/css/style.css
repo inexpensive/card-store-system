@@ -36,3 +36,7 @@ img.icon {
     position: fixed;
     overflow: hidden;
 }
+
+.table-nonfluid {
+    width: auto !important;
+}
