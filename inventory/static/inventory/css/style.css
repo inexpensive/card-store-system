@@ -19,3 +19,20 @@ img.icon {
     width: auto;
     vertical-align: text-top;
 }
+
+.set-row figure {
+    display: none;
+}
+
+.card-picture img {
+    display: block;
+    border-radius: 0.8em;
+    max-width: 100%;
+    height: auto;
+}
+
+.set-row:hover figure {
+    display: block;
+    position: fixed;
+    overflow: hidden;
+}
