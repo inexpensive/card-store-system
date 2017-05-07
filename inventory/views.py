@@ -77,7 +77,6 @@ def search(request):
             search=vector,
             rank=SearchRank(vector, search_query)
         ).filter(card_search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
-        print(card_list.query)
         paginator = Paginator(card_list, 25)
         page = request.GET.get('page')
         try:
