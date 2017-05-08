@@ -7,6 +7,9 @@
 {% endblock %}
 {% block content %}
     <script src="{% static 'inventory/js/hoverphoto.js' %}" type="text/javascript"></script>
+    <script src="{% static 'inventory/js/populatePricingTable.js' %}" type="text/javascript"></script>
+    <button>TEST</button>
+    <div id="test-table"></div>
     <table id="pricing-table" class="table table-striped table-bordered table-sm table-nonfluid">
     <tbody>
         <tr>
@@ -40,7 +43,7 @@
             <td>$40.99</td>
             <td>(N/A)</td>
             <td>$8.99</td>
-            <td>$46.99</td>
+            <td>($46.99)</td>
         </tr>
         <tr>
             <th>SP</th>
@@ -49,16 +52,16 @@
             <td>$36.99</td>
             <td>(N/A)</td>
             <td>$7.99</td>
-            <td>$41.99</td>
+            <td>($41.99)</td>
         </tr>
         <tr>
             <th>MP</th>
             <td>$1.49</td>
-            <td>($8.49)</td>
+            <td>($7.49)</td>
             <td>$29.99</td>
             <td>(N/A)</td>
             <td>$6.99</td>
-            <td>$34.99</td>
+            <td>($34.99)</td>
         </tr>
         <tr>
             <th>HP</th>
@@ -67,7 +70,7 @@
             <td>$19.99</td>
             <td>(N/A)</td>
             <td>$4.49</td>
-            <td>$23.99</td>
+            <td>($23.99)</td>
         </tr>
     </tbody>
     </table>

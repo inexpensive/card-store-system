@@ -9,5 +9,7 @@ urlpatterns = [
     # ex: /inv/search/card_search_box=island
     url(r'^search/.*$', views.search, name='search'),
     # ex: /inv/autocomplete/
-    url(r'^autocomplete/.*$', views.autocomplete, name='autocomplete')
+    url(r'^autocomplete/.*$', views.autocomplete, name='autocomplete'),
+    # ex: /inv/pricing/
+    url(r'^pricing/.*$', views.pricing_ajax),
 ]

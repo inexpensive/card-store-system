@@ -124,6 +124,33 @@ def pricing(request):
         return HttpResponseNotFound()
 
 
+def pricing_ajax(request):
+    if request.is_ajax():
+        q = request.GET.get('name', '')
+        cards = Card.objects.filter(name=q).order_by('-set__release_date', 'set__name', 'foil')[:64]
+        condition_order = {
+            'NM': 1,
+            'SP': 2,
+            'MP': 3,
+            'HP': 4,
+        }
+        cards = sorted(cards, key=lambda x: condition_order[x.condition])
+        results = []
+        for card in cards:
+            card_json = {
+                'name': card.name,
+                'set': card.set.name,
+                'condition': card.condition,
+                'price': card.price,
+            }
+            results.append(card_json)
+        data = json.dumps(results)
+    else:
+        data = 'nope'
+    mimetype = 'application/json'
+    return HttpResponse(data, mimetype)
+
+
 def signup(request):
     if request.method == 'POST':
         user_form = UserForm(request.POST)
