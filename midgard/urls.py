@@ -29,4 +29,5 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^signup/$', inventory.views.signup, name='signup'),
     url(r'^parse_all_sets$', common.util.SetParser.parse_all_sets),
+    url(r'^parse_all_cards$', common.util.CardParser.parse_all_cards),
 ]
