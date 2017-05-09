@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     'django_countries',
     'localflavor',
     'inventory.apps.InventoryConfig',
+    'common.util.apps.UtilConfig',
 ]
 
 MIDDLEWARE = [
