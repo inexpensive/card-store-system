@@ -10,7 +10,7 @@ from django.shortcuts import render, get_list_or_404, get_object_or_404, redirec
 from django.views import generic
 
 from inventory.templatetags.card_filters import replace_symbols
-from .models import Card, Set
+from .models import MagicCard, MagicSet
 from .forms import UserForm, ProfileForm
 
 
@@ -19,32 +19,32 @@ class IndexView(generic.ListView):
     context_object_name = 'set_list'
 
     def get_queryset(self):
-        return Set.objects.order_by('-release_date')
+        return MagicSet.objects.order_by('-release_date')
 
 
-class SetView(generic.ListView):
-    model = Card
+class MagicSetView(generic.ListView):
+    model = MagicCard
     template_name = 'inventory/cardlist.html'
 
     def get_queryset(self):
-        return Card.objects
+        return MagicCard.objects
 
 
 class SearchView(generic.ListView):
-    model = Card
+    model = MagicCard
     template_name = 'inventory/cardlist.html'
 
     def get_queryset(self):
-        return Card.objects
+        return MagicCard.objects
 
 
-class CardDetailsView(generic.DetailView):
-    model = Card
+class MagicCardDetailsView(generic.DetailView):
+    model = MagicCard
     template_name = 'inventory/carddetails.html'
 
 
 def index(request):
-    set_list = Set.objects.order_by('-release_date')
+    set_list = MagicSet.objects.order_by('-release_date')
     template = loader.get_template('inventory/index.html')
     context = {
         'set_list': set_list,
@@ -53,7 +53,7 @@ def index(request):
 
 
 def cardset(request, set_id):
-    card_list = get_list_or_404(Card.objects.order_by('name'), set=set_id, foil=False, condition='NM')
+    card_list = get_list_or_404(MagicCard.objects.order_by('name'), set=set_id)
     paginator = Paginator(card_list, 25)
     page = request.GET.get('page')
     try:
@@ -73,10 +73,10 @@ def search(request):
             SearchVector('rules_text', weight='C') + \
             SearchVector('color_text', 'power', 'toughness', 'artist', 'flavor_text', weight='D')
         search_query = SearchQuery(query)
-        card_list = Card.objects.annotate(
+        card_list = MagicCard.objects.annotate(
             search=vector,
             rank=SearchRank(vector, search_query)
-        ).filter(card_search=query, foil=False, condition='NM', ).order_by('-rank', 'name')
+        ).filter(card_search=query).order_by('-rank', 'name')
         paginator = Paginator(card_list, 25)
         page = request.GET.get('page')
         try:
@@ -91,10 +91,10 @@ def search(request):
 def autocomplete(request):
     if request.is_ajax():
         q = request.GET.get('term', '')
-        cards = Card.objects\
-                    .filter(name__icontains=q, condition='NM', foil=False)\
-                    .exclude(image='/images/None/no_art.jpg')\
-                    .order_by('name', 'set__release_date').distinct('name')[:10]
+        cards = MagicCard.objects \
+            .filter(name__icontains=q) \
+            .exclude(image='/images/None/no_art.jpg') \
+            .order_by('name', 'set__release_date').distinct('name')[:10]
         results = []
         for card in cards:
             card_json = {
@@ -113,7 +113,7 @@ def autocomplete(request):
 
 
 def card_details(request, card_id):
-    card = get_object_or_404(Card, pk=card_id)
+    card = get_object_or_404(MagicCard, pk=card_id)
     return render(request, 'inventory/carddetails.html', {'card': card})
 
 
@@ -127,7 +127,7 @@ def pricing(request):
 def pricing_ajax(request):
     if request.is_ajax():
         q = request.GET.get('name', '')
-        cards = Card.objects.filter(name=q).order_by('-set__release_date', 'set__name', 'foil')[:64]
+        cards = MagicCard.objects.filter(name=q).order_by('-set__release_date', 'set__name')[:64]
         condition_order = {
             'NM': 1,
             'SP': 2,

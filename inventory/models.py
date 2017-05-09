@@ -16,30 +16,26 @@ class Profile(models.Model):
     phone_number = models.CharField(max_length=20, blank=True)
 
 
-class Set(models.Model):
+class MagicSet(models.Model):
     name = models.CharField(max_length=100)
     code = models.CharField(max_length=10)
     release_date = models.DateField()
-    cards_in_set = models.IntegerField()
+    cards_in_set = models.IntegerField(default=0)
+
+    class Meta:
+        unique_together = ('name', 'code', 'release_date')
 
     def __str__(self):
         return self.name
 
 
-class Card(models.Model):
+class MagicCard(models.Model):
     RARITIES = (
         ('C', 'Common'),
         ('U', 'Uncommon'),
         ('R', 'Rare'),
         ('M', 'Mythic'),
         ('B', 'Basic Land'),
-    )
-
-    CONDITIONS = (
-        ('NM', 'Near Mint'),
-        ('SP', 'Slightly Played'),
-        ('MP', 'Moderately Played'),
-        ('HP', 'Heavily Played')
     )
 
     COLORS = (
@@ -51,41 +47,108 @@ class Card(models.Model):
         ('C', 'Colorless'),
     )
 
+    LANGUAGES = (
+        ('EN', 'English'),
+        ('CT', 'Chinese (Traditional)'),
+        ('CS', 'Chinese (Simplified)'),
+        ('FR', 'French'),
+        ('DE', 'German'),
+        ('IT', 'Italian'),
+        ('JP', 'Japanese'),
+        ('KR', 'Korean'),
+        ('PT', 'Portuguese'),
+        ('RU', 'Russian'),
+        ('ES', 'Spanish'),
+        ('OT', 'Other'),
+    )
+
     name = models.CharField(max_length=170)
-    set = models.ForeignKey(Set)
+    set = models.ForeignKey(MagicSet)
     color = ArrayField(models.CharField(max_length=1, choices=COLORS))
     color_text = models.CharField(max_length=50)
     color_identity = ArrayField(models.CharField(max_length=1, choices=COLORS))
-    layout_type = models.CharField(max_length=50)
+    layout_type = models.CharField(max_length=50, default='normal')
     ordered_card_names = ArrayField(models.CharField(max_length=170), blank=True)
-    is_focal_card = models.BooleanField()
+    is_focal_card = models.BooleanField(default=True)
     super_types = ArrayField(models.CharField(max_length=40), blank=True)
-    super_types_text = models.CharField(max_length=100)
+    super_types_text = models.CharField(max_length=100, blank=True)
     types = ArrayField(models.CharField(max_length=40), blank=True)
-    types_text = models.CharField(max_length=100)
+    types_text = models.CharField(max_length=100, blank=True)
     sub_types = ArrayField(models.CharField(max_length=40), blank=True)
-    sub_types_text = models.CharField(max_length=100)
+    sub_types_text = models.CharField(max_length=100, blank=True)
     mana_cost = models.CharField(max_length=100)
     cmc = models.IntegerField()
-    card_language = models.CharField(max_length=15)
-    rules_text = models.TextField()
-    flavor_text = models.TextField()
+    card_language = models.CharField(max_length=15, choices=LANGUAGES, default='EN')
+    rules_text = models.TextField(blank=True)
+    flavor_text = models.TextField(blank=True)
     collector_number = models.CharField(max_length=8)
-    multiverse_id = models.IntegerField()
+    multiverse_id = models.IntegerField(null=True)
     artist = models.CharField(max_length=100)
-    stock = models.IntegerField()
-    price = models.FloatField()
-    image = models.ImageField(upload_to='templates/images/', default='templates/images/None/nothing.img',
-                              max_length=300)
+    image = models.ImageField(upload_to='inventory/static/images/', default='images/None/nothing.img', max_length=300)
     rarity = models.CharField(max_length=1, choices=RARITIES)
-    condition = models.CharField(max_length=2, choices=CONDITIONS)
-    foil = models.BooleanField()
-    power = models.CharField(max_length=5)
-    toughness = models.CharField(max_length=5)
+    power = models.CharField(max_length=5, blank=True)
+    toughness = models.CharField(max_length=5, blank=True)
     card_search = SearchVectorField(db_index=True, null=True)
 
     class Meta:
-        unique_together = ('name', 'set', 'card_language', 'condition', 'foil', 'collector_number', 'multiverse_id')
+        unique_together = ('name', 'set', 'card_language', 'collector_number', 'multiverse_id')
 
     def __str__(self):
         return self.name
+
+
+class MagicCardItem(models.Model):
+    NM = 'NM'
+    SP = 'SP'
+    MP = 'MP'
+    HP = 'HP'
+    CONDITIONS = (
+        (NM, 'Near Mint'),
+        (SP, 'Slightly Played'),
+        (MP, 'Moderately Played'),
+        (HP, 'Heavily Played')
+    )
+    card = models.ForeignKey(MagicCard)
+    price = models.FloatField(default=-1)
+    buylist = models.FloatField(default=-1)
+    stock = models.IntegerField(default=0)
+    condition = models.CharField(max_length=2, choices=CONDITIONS)
+    foil = models.BooleanField()
+
+    class Meta:
+        unique_together = ('card', 'condition', 'foil')
+
+
+class Item(models.Model):
+    name = models.CharField(max_length=200)
+    type = models.CharField(max_length=200)
+    price = models.FloatField(default=-1)
+    magic_set = models.ForeignKey(MagicSet, blank=True)
+
+    class Meta:
+        unique_together = ('name', 'type')
+
+
+class Transaction(models.Model):
+    BUY = 'BUY'
+    DIST = 'DIST'
+    SELL = 'SELL'
+    CHARITY = 'CHARITY'
+    DISCARD = 'DISCARD'
+    TRANSACTION_TYPES = (
+        (BUY, 'Purchase from Customer'),
+        (DIST, 'Distributor Purchase'),
+        (SELL, 'Sell'),
+        (CHARITY, 'Charitable Donation'),
+        (DISCARD, 'Discarded'),
+    )
+    customer = models.ForeignKey(User, blank=True)
+    distributor = models.CharField(max_length=100)
+    charity = models.CharField(max_length=100)
+    quantity = models.IntegerField()
+    price = models.FloatField()
+    magic_card = models.ForeignKey(MagicCardItem, blank=True)
+    item = models.ForeignKey(Item, blank=True)
+    type = models.CharField(max_length=10, choices=TRANSACTION_TYPES)
+    provincial_tax = models.FloatField()
+    federal_tax = models.FloatField()
