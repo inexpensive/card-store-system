@@ -1,0 +1,9 @@
+Django==1.11.1
+django-countries==4.5
+django-localflavor==1.4.1
+olefile==0.44
+Pillow==4.1.1
+psycopg2==2.7.1
+pytz==2017.2
+PyYAML==3.12
+requests==2.14.1
