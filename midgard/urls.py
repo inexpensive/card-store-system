@@ -18,6 +18,8 @@ from django.contrib import admin
 from django.contrib.auth import views as auth_views
 
 import inventory.views
+import common.util.SetParser
+import common.util.CardParser
 
 urlpatterns = [
     url(r'^inv/', include('inventory.urls', namespace='inventory')),
@@ -26,4 +28,6 @@ urlpatterns = [
     url(r'^pricing/', inventory.views.pricing),
     url(r'^admin/', admin.site.urls),
     url(r'^signup/$', inventory.views.signup, name='signup'),
+    url(r'^parse_all_sets$', common.util.SetParser.parse_all_sets),
+    url(r'^parse_all_cards$', common.util.CardParser.parse_all_cards),
 ]

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Set, Card
+from .models import MagicSet, MagicCard
 
 
 class SetAdmin(admin.ModelAdmin):
@@ -11,7 +11,7 @@ class SetAdmin(admin.ModelAdmin):
 
 
 class CardAdmin(admin.ModelAdmin):
-    list_display = ('name', 'set', 'rarity', 'foil', 'stock', 'price')
+    list_display = ('name', 'set', 'rarity')
     fieldsets = [
         (None, {'fields': ['name',
                            'set',
@@ -24,11 +24,8 @@ class CardAdmin(admin.ModelAdmin):
                            'flavor_text',
                            'collector_number',
                            'artist',
-                           'stock',
-                           'price',
                            'image',
                            'rarity',
-                           'foil',
                            'power',
                            'toughness']
                 }
@@ -36,5 +33,5 @@ class CardAdmin(admin.ModelAdmin):
     ]
 
 
-admin.site.register(Set, SetAdmin)
-admin.site.register(Card, CardAdmin)
+admin.site.register(MagicSet, SetAdmin)
+admin.site.register(MagicCard, CardAdmin)

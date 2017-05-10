@@ -1,5 +1,6 @@
 from unittest import TestCase
-from app.utils.PriceFetcher import PriceFetcher, round_price, get_mtg_goldfish_set_code_exception
+
+from common.util.PriceFetcher import PriceFetcher, round_price, get_mtg_goldfish_set_code_exception
 
 
 class TestPriceFetcher(TestCase):
