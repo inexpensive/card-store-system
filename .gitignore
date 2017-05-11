@@ -4,3 +4,10 @@ images
 inventory/migrations
 allowed_hosts.yaml
 config.yaml
+common/__pycache__/
+common/util/__pycache__/
+inventory/__pycache__/
+inventory/templatetags/__pycache__/
+midgard/__init__.pyc
+midgard/__pycache__/
+midgard/settings.pyc
