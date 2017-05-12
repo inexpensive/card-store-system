@@ -80,7 +80,8 @@ class PriceFetcher:
         prices = {}
         for row in table_rows:
             name = row.find('a').text
-            price = self.convert_to_cad(float(re.sub('[\n,]', '', row.find('td', class_='text-right').text))) * price_adjustment
+            price = self.convert_to_cad(float(re.sub('[\n,]', '', row.find('td', class_='text-right').text))) \
+                * price_adjustment
             price_by_condition = self.get_condition_prices_tuple(price)
             prices[name] = price_by_condition
         return prices
