@@ -19,7 +19,7 @@ def get_set_name(card_set):
 
 def parse_all_sets(request):
     if request.user.id == 1:
-        with open('AllSets.json') as data_file:
+        with open('AllSets.json', encoding='utf8') as data_file:
             data = json.load(data_file)
             for key in data.keys():
                 card_set = data[key]

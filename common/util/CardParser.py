@@ -76,8 +76,10 @@ def download_image(name, card, card_set_code, new_card):
     if 'multiverseid' in card.keys():
         multiverse_id = card['multiverseid']
         new_card.multiverse_id = multiverse_id
+        card_name = name.replace(' ', '_')
+        card_name = re.sub('[?:%*|"<>.]', '', card_name)  # removes characters not allowed in windows file paths
         image_path = os.path.abspath(
-            'inventory/static/images/{0}/{1}_{2}.jpg'.format(card_set_code, name.replace(' ', '_'), multiverse_id))
+            'inventory/static/images/{0}/{1}_{2}.jpg'.format(card_set_code, card_name, multiverse_id))
         if not os.path.exists(image_path):
             directory = os.path.dirname(image_path)
             if not os.path.exists(directory):
@@ -88,7 +90,8 @@ def download_image(name, card, card_set_code, new_card):
             with open(image_path, 'wb') as out_file:
                 shutil.copyfileobj(r.raw, out_file)
             del r
-        image_path = re.search("/images.*", image_path).group(0)
+        image_path = re.search('[/\\\]images.*', image_path).group(0)  # accounts for unix and windows file paths
+        image_path = image_path.replace('\\', '/')  # convert windows path to valid html format
         new_card.image = image_path
 
 
@@ -137,7 +140,7 @@ def parse_all_cards(request):
         with open('online_only_sets.yaml') as f:
             online_only_sets = yaml.load(f)
 
-        with open('AllSets.json') as data_file:
+        with open('AllSets.json', encoding='utf8') as data_file:
             data = json.load(data_file)
             card_sets = data.keys()
             for set_ in card_sets:
