@@ -4,3 +4,4 @@ images
 inventory/migrations
 allowed_hosts.yaml
 config.yaml
+env
