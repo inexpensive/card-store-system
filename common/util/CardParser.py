@@ -2,6 +2,7 @@ import json
 import os
 import time
 import datetime
+import platform
 
 import requests
 import shutil
@@ -73,6 +74,8 @@ def get_power_and_toughness(card, new_card):
 
 
 def download_image(name, card, card_set_code, new_card):
+    if card_set_code == 'CON' and platform.system() == 'Windows':
+        card_set_code = 'CONF'
     if 'multiverseid' in card.keys():
         multiverse_id = card['multiverseid']
         new_card.multiverse_id = multiverse_id
