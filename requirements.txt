@@ -1,6 +1,9 @@
+bs4==0.0.1
 Django==1.11.1
 django-countries==4.5
 django-localflavor==1.4.1
+forex-python==0.3.2
+lxml==3.7.3
 olefile==0.44
 Pillow==4.1.1
 psycopg2==2.7.1
