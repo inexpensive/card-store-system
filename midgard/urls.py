@@ -20,6 +20,7 @@ from django.contrib.auth import views as auth_views
 import inventory.views
 import common.util.SetParser
 import common.util.CardParser
+import common.util.PriceUpdater
 
 urlpatterns = [
     url(r'^inv/', include('inventory.urls', namespace='inventory')),
@@ -27,7 +28,8 @@ urlpatterns = [
     url(r'^logout', auth_views.logout, {'next_page': '/inv/'}, name='logout'),
     url(r'^pricing/', inventory.views.pricing),
     url(r'^admin/', admin.site.urls),
-    url(r'^signup/$', inventory.views.signup, name='signup'),
-    url(r'^parse_all_sets$', common.util.SetParser.parse_all_sets),
-    url(r'^parse_all_cards$', common.util.CardParser.parse_all_cards),
+    url(r'^signup/', inventory.views.signup, name='signup'),
+    url(r'^parse_all_sets/', common.util.SetParser.parse_all_sets),
+    url(r'^parse_all_cards/', common.util.CardParser.parse_all_cards),
+    url(r'^create_all_prices/', common.util.PriceUpdater.create_all_prices),
 ]

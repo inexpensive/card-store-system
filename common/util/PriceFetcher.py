@@ -37,7 +37,7 @@ def get_price_markup_from_mtg_goldfish(url):
 
 
 def get_mtg_goldfish_set_code_exception(set_):
-    with open('../mtg_goldfish_exceptions.yaml') as file:
+    with open('mtg_goldfish_exceptions.yaml') as file:
         exceptions = yaml.load(file)
     if set_ in exceptions.keys():
         return exceptions[set_]
